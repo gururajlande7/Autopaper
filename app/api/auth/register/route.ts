@@ -97,6 +97,15 @@ export async function POST(request: Request) {
   } catch (error) {
     if (createdUserId) {
       await UserModel.deleteOne({ _id: createdUserId }).catch(() => undefined)
+      logError('auth.verification_email_failed', error, { requestId })
+
+      return NextResponse.json(
+        {
+          error:
+            'Account could not be created because the verification email failed to send. Check Gmail SMTP environment variables and app password.',
+        },
+        { status: 503 },
+      )
     }
 
     logError('auth.registration_failed', error, { requestId })
