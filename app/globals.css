@@ -125,7 +125,7 @@
     @apply font-sans overflow-x-hidden;
   }
   body {
-    @apply bg-background text-foreground w-screen min-h-screen overflow-x-hidden;
+    @apply bg-background text-foreground w-full min-h-screen overflow-x-hidden;
   }
 }
 
@@ -300,6 +300,45 @@
   font-size: 11pt;
   line-height: 1.25;
   text-transform: uppercase;
+}
+
+.paper-section-heading span,
+.paper-section-heading small {
+  display: block;
+}
+
+.paper-section-heading small {
+  margin-top: 0.8mm;
+  color: #475569;
+  font-size: 8.5pt;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.paper-instructions {
+  margin-bottom: 4mm;
+  padding: 2.5mm 3mm;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.paper-instructions h2 {
+  margin: 0 0 1.5mm;
+  color: #172554;
+  font-size: 9.5pt;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.paper-instructions ol {
+  margin: 0;
+  padding-left: 5mm;
+}
+
+.paper-instructions li {
+  margin: 0.6mm 0;
+  font-size: 8.2pt;
+  line-height: 1.35;
 }
 
 .paper-question-text {

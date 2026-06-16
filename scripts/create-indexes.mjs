@@ -27,7 +27,21 @@ try {
     { expireAfterSeconds: 0, name: 'quota_expiry' },
   )
 
-  console.log('Question and daily quota indexes are ready.')
+  const usersCollection = mongoose.connection.collection('users')
+  await usersCollection.createIndex(
+    { email: 1 },
+    { unique: true, name: 'unique_user_email' },
+  )
+  await usersCollection.createIndex(
+    { emailVerificationTokenHash: 1 },
+    { unique: true, sparse: true, name: 'email_verification_token' },
+  )
+  await usersCollection.createIndex(
+    { passwordResetTokenHash: 1 },
+    { unique: true, sparse: true, name: 'password_reset_token' },
+  )
+
+  console.log('Question, quota, and user indexes are ready.')
 } finally {
   await mongoose.disconnect()
 }

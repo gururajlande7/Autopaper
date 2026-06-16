@@ -7,11 +7,17 @@ import { cn } from '@/lib/utils'
 
 export const metadata = {
   title: 'Contact',
-  description: 'Contact the AutoPaper team.',
+  description: 'Contact AutoPaper.',
 }
 
 export default function ContactPage() {
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL
+  const contactEmails = Array.from(
+    new Set(
+      [process.env.NEXT_PUBLIC_CONTACT_EMAIL, 'riteshworking247@gmail.com'].filter(
+        Boolean,
+      ) as string[],
+    ),
+  )
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background">
@@ -29,16 +35,21 @@ export default function ContactPage() {
             subject.
           </p>
 
-          {email ? (
-            <a
-              className={cn(
-                buttonVariants({ size: 'lg' }),
-                'mt-7 h-11 bg-primary px-7 text-white',
-              )}
-              href={`mailto:${email}?subject=AutoPaper enquiry`}
-            >
-              Email {email}
-            </a>
+          {contactEmails.length > 0 ? (
+            <div className="mt-7 flex flex-col items-center gap-3">
+              {contactEmails.map((email) => (
+                <a
+                  className={cn(
+                    buttonVariants({ size: 'lg' }),
+                    'h-auto min-h-11 max-w-full bg-primary px-5 py-3 text-sm text-white sm:px-7 sm:text-base',
+                  )}
+                  href={`mailto:${email}?subject=AutoPaper enquiry`}
+                  key={email}
+                >
+                  <span className="break-all">Email {email}</span>
+                </a>
+              ))}
+            </div>
           ) : (
             <p className="mt-7 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
               Contact email is not configured yet. Set{' '}

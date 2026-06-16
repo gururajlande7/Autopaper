@@ -3,6 +3,7 @@ import type { Subject } from './types'
 export type PaperPatternSection = {
   questionType: string
   count: number
+  attempt?: number
   title: string
 }
 
@@ -39,10 +40,10 @@ export const PAPER_PATTERNS: Record<Subject, PaperPattern> = {
     label: 'Science and Technology - I',
     chapterQuota: [5, 6, 6, 7, 5, 7, 6, 6, 7, 5],
     sections: [
-      { questionType: '5m', count: 2, title: 'Answer The Following' },
-      { questionType: '3m', count: 8, title: 'Answer The Following' },
-      { questionType: '2m', count: 5, title: 'Answer The Following' },
-      { questionType: 'gr', count: 3, title: 'Give Reason' },
+      { questionType: '5m', count: 2, attempt: 1, title: 'Answer The Following' },
+      { questionType: '3m', count: 8, attempt: 5, title: 'Answer The Following' },
+      { questionType: '2m', count: 5, attempt: 3, title: 'Answer The Following' },
+      { questionType: 'gr', count: 3, attempt: 2, title: 'Give Reason' },
       { questionType: 'obj', count: 5, title: 'Objective Questions' },
       { questionType: 'MCQ', count: 5, title: 'Multiple Choice Questions' },
     ],
@@ -51,10 +52,10 @@ export const PAPER_PATTERNS: Record<Subject, PaperPattern> = {
     label: 'Science and Technology - II',
     chapterQuota: [5, 6, 6, 7, 5, 7, 6, 6, 7, 5],
     sections: [
-      { questionType: '5m', count: 2, title: 'Answer The Following' },
-      { questionType: '3m', count: 8, title: 'Answer The Following' },
-      { questionType: '2m', count: 5, title: 'Answer The Following' },
-      { questionType: 'gr', count: 3, title: 'Give Reason' },
+      { questionType: '5m', count: 2, attempt: 1, title: 'Answer The Following' },
+      { questionType: '3m', count: 8, attempt: 5, title: 'Answer The Following' },
+      { questionType: '2m', count: 5, attempt: 3, title: 'Answer The Following' },
+      { questionType: 'gr', count: 3, attempt: 2, title: 'Give Reason' },
       { questionType: 'obj', count: 5, title: 'Objective Questions' },
       { questionType: 'MCQ', count: 5, title: 'Multiple Choice Questions' },
     ],
@@ -63,28 +64,28 @@ export const PAPER_PATTERNS: Record<Subject, PaperPattern> = {
     label: 'Mathematics - I',
     chapterQuota: [12, 12, 8, 8, 8, 12],
     sections: [
-      { questionType: '5', count: 2, title: 'Answer The Following' },
-      { questionType: '4', count: 3, title: 'Answer The Following' },
-      { questionType: '3b', count: 4, title: 'Answer The Following' },
-      { questionType: '3a', count: 2, title: 'Activity' },
-      { questionType: '2b', count: 5, title: 'Answer The Following' },
-      { questionType: '2a', count: 3, title: 'Activity' },
-      { questionType: '1b', count: 4, title: 'Objective Questions' },
-      { questionType: '1a', count: 4, title: 'Multiple Choice Questions' },
+      { questionType: '5', count: 2, attempt: 1, title: 'Answer The Following' },
+      { questionType: '4', count: 3, attempt: 2, title: 'Answer The Following' },
+      { questionType: '3b', count: 4, attempt: 3, title: 'Answer The Following' },
+      { questionType: '3a', count: 2, attempt: 1, title: 'Activity' },
+      { questionType: '2b', count: 5, attempt: 3, title: 'Answer The Following' },
+      { questionType: '2a', count: 3, attempt: 2, title: 'Activity' },
+      { questionType: '1b', count: 4, attempt: 3, title: 'Objective Questions' },
+      { questionType: '1a', count: 4, attempt: 2, title: 'Multiple Choice Questions' },
     ],
   },
   'math-2': {
     label: 'Mathematics - II',
     chapterQuota: [12, 12, 8, 8, 8, 12],
     sections: [
-      { questionType: '5', count: 2, title: 'Answer The Following' },
-      { questionType: '4', count: 3, title: 'Answer The Following' },
-      { questionType: '3b', count: 4, title: 'Answer The Following' },
-      { questionType: '3a', count: 2, title: 'Activity' },
-      { questionType: '2b', count: 5, title: 'Answer The Following' },
-      { questionType: '2a', count: 3, title: 'Activity' },
-      { questionType: '1b', count: 4, title: 'Objective Questions' },
-      { questionType: '1a', count: 4, title: 'Multiple Choice Questions' },
+      { questionType: '5', count: 2, attempt: 1, title: 'Answer The Following' },
+      { questionType: '4', count: 3, attempt: 2, title: 'Answer The Following' },
+      { questionType: '3b', count: 4, attempt: 3, title: 'Answer The Following' },
+      { questionType: '3a', count: 2, attempt: 1, title: 'Activity' },
+      { questionType: '2b', count: 5, attempt: 3, title: 'Answer The Following' },
+      { questionType: '2a', count: 3, attempt: 2, title: 'Activity' },
+      { questionType: '1b', count: 4, attempt: 3, title: 'Objective Questions' },
+      { questionType: '1a', count: 4, attempt: 2, title: 'Multiple Choice Questions' },
     ],
   },
 }

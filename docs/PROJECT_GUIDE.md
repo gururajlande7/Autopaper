@@ -42,7 +42,7 @@ History and Geography are visible as disabled "Coming soon" choices.
 | Math rendering | KaTeX | Mathematical expressions in questions |
 | Printing | Browser print API and CSS | A4 preview and PDF output |
 | Testing | Vitest | Difficulty and rate-limit unit tests |
-| Analytics | Vercel Analytics | Production usage analytics |
+| Analytics | Vercel Analytics and GA4 | Production usage analytics |
 | 3D homepage | React Three Fiber | Animated atom model |
 
 ## 3. High-Level Architecture
@@ -86,6 +86,7 @@ app/
   globals.css             Website and A4 print styles
 
 components/
+  auth/                  Account forms and session-aware header controls
   paper/
     paper-builder.tsx     Form state and API request
     paper-preview.tsx     A4 pagination, preview, and printing
@@ -102,14 +103,22 @@ lib/
     patterns.ts           Paper blueprints and chapter quotas
     types.ts              Shared TypeScript types and validators
   server/
-    daily-paper-limit.ts  Five successful papers per IP per UTC day
+    auth.ts               Resolve verified users from JWT cookies
+    auth-validation.ts    Registration and password validation
+    daily-paper-limit.ts  Five successful papers per user per UTC day
+    email.ts              Resend verification/reset emails
     env.ts                Server environment validation
+    jwt.ts                Signed session tokens and cookie options
     logger.ts             Structured JSON logs
+    password.ts           Scrypt password hashing
     rate-limit.ts         Short in-memory burst limiter
+    request.ts            Safe JSON body reader
+    tokens.ts             One-time verification/reset tokens
 
 models/
   question.ts             Question collection schema
   paper-generation-quota.ts
+  user.ts                 Account and verification state
 
 scripts/
   create-indexes.mjs      Production MongoDB indexes
@@ -120,6 +129,11 @@ tests/
 ```
 
 ## 5. Complete Paper Generation Flow
+
+Before this flow, the user must register, explicitly verify the email link,
+and sign in. `/create` and `POST /api/papers` both reject unverified or missing
+sessions. The JWT is stored in an HttpOnly cookie and is checked against the
+current user's `sessionVersion`.
 
 ### Step 1: The user fills in the form
 
@@ -566,6 +580,76 @@ Writes an informational structured log.
 
 Writes a structured error. Stack traces are omitted in production.
 
+### Authentication server modules
+
+#### `hashPassword(password)`
+
+Creates a random salt and derives a 64-byte password key with Node.js
+`scrypt`. MongoDB stores the algorithm, salt, and derived key, never the plain
+password.
+
+#### `verifyPassword(password, storedHash)`
+
+Derives a key using the stored salt and compares it with
+`timingSafeEqual()` to reduce timing attacks.
+
+#### `createOneTimeToken()`
+
+Creates a cryptographically random verification or password-reset token and
+returns both the raw token and its SHA-256 hash. Only the hash is stored.
+
+#### `hashOneTimeToken(token)`
+
+Hashes a token received from an email link so it can be compared with MongoDB.
+
+#### `createSessionToken(user, now)`
+
+Creates a signed HS256 JWT containing the user ID, email, name, session
+version, issue/expiry times, issuer, audience, and a unique token ID. Sessions
+expire after seven days.
+
+#### `verifySessionToken(token, now)`
+
+Verifies the HMAC signature with a timing-safe comparison, validates required
+claims, and rejects expired or future-issued tokens.
+
+#### `getUserFromRequest(request)`
+
+Reads the HttpOnly session cookie from an API request, verifies the JWT, and
+loads the current verified user from MongoDB.
+
+#### `getCurrentUser()`
+
+Server-component version of session lookup using Next.js `cookies()`.
+
+#### `sendVerificationEmail(...)`
+
+Builds a 24-hour confirmation URL and sends it through the Resend HTTPS API.
+The email link opens a confirmation page; an explicit button consumes the
+token so automated email scanners do not activate accounts.
+
+#### `sendPasswordResetEmail(...)`
+
+Sends a one-hour password-reset URL through Resend.
+
+#### `readJsonBody(request)`
+
+Requires JSON, limits auth request bodies to 4 KB, and returns controlled 400,
+413, or 415 responses for invalid input.
+
+### Authentication API routes
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/auth/register` | Create an unverified account and send email |
+| `POST /api/auth/verify-email` | Consume the verification token and sign in |
+| `POST /api/auth/resend-verification` | Send a new 24-hour link |
+| `POST /api/auth/login` | Verify credentials and set the JWT cookie |
+| `POST /api/auth/logout` | Clear the JWT cookie |
+| `GET /api/auth/me` | Return the current verified user |
+| `POST /api/auth/forgot-password` | Send a reset link without revealing account existence |
+| `POST /api/auth/reset-password` | Set a new password and invalidate older sessions |
+
 ### `lib/utils.ts`
 
 #### `cn(...inputs)`
@@ -763,11 +847,11 @@ empty list when `NEXT_PUBLIC_APP_URL` is missing.
 
 #### `LoginPage()`
 
-Redirects `/login` to `/create`. Authentication is intentionally not active.
+Shows the login form and redirects an already authenticated user to `/create`.
 
 #### `SignInPage()`
 
-Redirects `/signin` to `/create` for the same reason as `LoginPage`.
+Redirects the legacy `/signin` URL to `/login`.
 
 ## 10. A4 Pagination and Print CSS
 
@@ -812,22 +896,35 @@ Current protections:
 - No-store API responses
 - Security headers in `next.config.mjs`
 - Request IDs for troubleshooting
-
-The application does not currently include authentication or authorization.
+- Scrypt password hashing with unique salts
+- Signed HS256 JWT sessions in HttpOnly, SameSite cookies
+- Verified-email requirement for protected pages and APIs
+- Hashed, expiring, one-time email verification and reset tokens
+- Session invalidation after password reset
+- Generic forgot-password responses to reduce account enumeration
+- Explicit verification action to avoid email-scanner link consumption
 
 ## 12. Environment Variables
 
 ```env
 MONGODB_URI=mongodb+srv://...
+JWT_SECRET=long-random-secret
 NEXT_PUBLIC_APP_URL=https://your-domain.com
+RESEND_API_KEY=re_xxxxxxxxx
+EMAIL_FROM="AutoPaper <noreply@your-domain.com>"
 NEXT_PUBLIC_CONTACT_EMAIL=you@example.com
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 | Variable | Required | Used by |
 | --- | --- | --- |
 | `MONGODB_URI` | Yes | Server database connection and index script |
-| `NEXT_PUBLIC_APP_URL` | Production | Metadata, sitemap, robots |
+| `JWT_SECRET` | Yes | Signing and verifying session JWTs |
+| `NEXT_PUBLIC_APP_URL` | Yes | Email links, metadata, sitemap, robots |
+| `RESEND_API_KEY` | Yes | Verification and password-reset email API |
+| `EMAIL_FROM` | Yes | Verified sender identity in Resend |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | No | Contact page |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics 4 web tracking |
 
 Never commit `.env.local`.
 
@@ -983,7 +1080,6 @@ Core engineering decisions to mention:
 
 ## 18. Known Scope
 
-- No user accounts or JWT authentication
 - No admin question-bank interface
 - No answer-key generation
 - No saved paper history

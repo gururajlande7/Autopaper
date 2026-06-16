@@ -18,19 +18,19 @@ function getNextUtcDay(now: Date) {
   )
 }
 
-function getQuotaId(clientIp: string, now: Date) {
+function getQuotaId(identity: string, now: Date) {
   return createHash('sha256')
-    .update(`${clientIp}:${getUtcDay(now)}`)
+    .update(`${identity}:${getUtcDay(now)}`)
     .digest('hex')
 }
 
 export async function reserveDailyPaper(
-  clientIp: string,
+  identity: string,
   now = new Date(),
 ) {
   await connectToDatabase()
 
-  const quotaId = getQuotaId(clientIp, now)
+  const quotaId = getQuotaId(identity, now)
 
   try {
     const quota = await PaperGenerationQuotaModel.findOneAndUpdate(

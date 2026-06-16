@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   BarChart3,
@@ -27,7 +28,7 @@ const steps = [
   {
     icon: BookOpen,
     title: 'Choose a subject',
-    copy: 'Select Science I, Science II, or Mathematics I.',
+    copy: 'Select Science I, Science II, Mathematics I, or Mathematics II.',
   },
   {
     icon: SlidersHorizontal,
@@ -47,26 +48,26 @@ export default function Home() {
       <BackgroundPattern />
       <Header />
 
-      <section className="relative flex min-h-[calc(100svh-65px)] items-center overflow-hidden py-8 sm:py-10">
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-6 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:px-8">
-          <div className="max-w-2xl text-left">
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-primary">
+      <section className="relative flex overflow-hidden py-9 sm:min-h-[calc(100svh-73px)] sm:items-center sm:py-10">
+        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-5 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:px-8">
+          <div className="max-w-2xl min-w-0 text-left">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-primary sm:text-sm sm:tracking-[0.18em]">
               Class 10 paper generator
             </p>
-            <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-full text-3xl font-bold leading-[1.08] tracking-tight text-foreground min-[380px]:text-4xl sm:text-5xl lg:text-6xl">
               Create structured question papers{' '}
               <span className="text-accent">in minutes</span>
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg">
               Generate curriculum-aligned papers from your question bank,
               review the A4 layout, and save a clean print-ready PDF.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 grid gap-3 min-[390px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap">
               <Link
                 href="/create"
                 className={cn(
                   buttonVariants({ size: 'lg' }),
-                  'h-11 bg-primary px-6 text-base text-white hover:bg-primary/90',
+                  'h-11 bg-primary px-4 text-sm text-white hover:bg-primary/90 sm:px-6 sm:text-base',
                 )}
               >
                 Create a question paper
@@ -75,7 +76,7 @@ export default function Home() {
                 href="/about"
                 className={cn(
                   buttonVariants({ size: 'lg', variant: 'outline' }),
-                  'h-11 border-primary px-6 text-base text-primary',
+                  'h-11 border-primary px-4 text-sm text-primary sm:px-6 sm:text-base',
                 )}
               >
                 Learn more
@@ -83,7 +84,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto h-[230px] w-full max-w-[480px] sm:h-[300px] lg:h-[430px]">
+          <div className="mx-auto h-[190px] w-full max-w-[300px] sm:h-[300px] sm:max-w-[480px] lg:h-[430px]">
             <AtomCanvas />
           </div>
         </div>
@@ -157,8 +158,8 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold">Mathematics</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Mathematics I with activities, objectives, and structured
-                mark-based questions.
+                Mathematics I and II with activities, objectives, and
+                structured mark-based questions.
               </p>
               <p className="mt-4 flex items-center gap-2 text-sm">
                 <CheckCircle className="h-4 w-4 text-primary" />
@@ -189,13 +190,24 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-7 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 font-bold text-primary">
-            <BookOpen className="h-5 w-5" />
-            AutoPaper
+      <footer className="relative border-t border-border bg-card/95">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm text-muted-foreground sm:px-6 md:grid-cols-[1.5fr_auto_auto] md:items-center lg:px-8">
+          <div className="flex items-center justify-center gap-3 text-center md:justify-start md:text-left">
+            <Image
+              alt="AutoPaper"
+              className="h-11 w-11 rounded-xl object-contain"
+              height={44}
+              src="/autopaper-logo.png"
+              width={44}
+            />
+            <div>
+              <p className="text-base font-bold text-primary">AutoPaper</p>
+              <p className="mt-1 max-w-xs">
+                Class 10 question papers, ready for A4 PDF export.
+              </p>
+            </div>
           </div>
-          <div className="flex gap-5">
+          <div className="flex justify-center gap-5 font-semibold">
             <Link href="/about" className="hover:text-primary">
               About
             </Link>
@@ -203,7 +215,7 @@ export default function Home() {
               Contact
             </Link>
           </div>
-          <p>Copyright 2026 AutoPaper</p>
+          <p className="text-center md:text-right">Copyright 2026 AutoPaper</p>
         </div>
       </footer>
     </main>

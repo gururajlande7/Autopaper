@@ -20,6 +20,7 @@ import {
 } from '@/lib/server/daily-paper-limit'
 import { checkRateLimit, getClientIp } from '@/lib/server/rate-limit'
 import { logError, logInfo } from '@/lib/server/logger'
+import { getUserFromRequest } from '@/lib/server/auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -77,6 +78,16 @@ export async function POST(request: Request) {
   }
 
   try {
+    const user = await getUserFromRequest(request)
+
+    if (!user) {
+      return jsonResponse(
+        { error: 'Sign in with a verified account to generate papers.' },
+        401,
+        requestId,
+      )
+    }
+
     const contentType = request.headers.get('content-type') || ''
 
     if (!contentType.toLowerCase().startsWith('application/json')) {
@@ -142,7 +153,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const dailyQuota = await reserveDailyPaper(clientIp)
+    const dailyQuota = await reserveDailyPaper(`user:${user.id}`)
 
     if (!dailyQuota.allowed) {
       return NextResponse.json(
@@ -181,6 +192,7 @@ export async function POST(request: Request) {
 
     logInfo('paper.generated', {
       requestId,
+      userId: user.id,
       subject: parsed.data.subject,
       mode: parsed.data.mode,
       chapter: parsed.data.chapter,

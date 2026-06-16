@@ -335,10 +335,26 @@ export function PaperPreview({
       </div>
 
       <div aria-hidden className="paper-source" ref={sourceRef}>
+        <div className="paper-item paper-instructions">
+          <h2>General Instructions</h2>
+          <ol>
+            <li>All questions are compulsory unless internal choice is given.</li>
+            <li>
+              Attempt only the required number of questions mentioned in each
+              section.
+            </li>
+            <li>Figures to the right indicate full marks.</li>
+            <li>
+              Write answers neatly and show necessary steps wherever required.
+            </li>
+          </ol>
+        </div>
+
         {paper.sections.map((section) => (
           <Fragment key={`${section.questionType}-section`}>
             <h2 className="paper-item paper-section-heading">
-              {section.title}
+              <span>{section.title}</span>
+              {section.instruction && <small>{section.instruction}</small>}
             </h2>
 
             {section.questions.map((question, index) => (

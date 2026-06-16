@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { GoogleAnalytics } from '@/components/google-analytics'
 import 'katex/dist/katex.min.css'
 import './globals.css'
 
@@ -59,9 +60,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background overflow-x-hidden`}>
-      <body className="font-sans antialiased w-screen min-h-screen overflow-x-hidden">
+      <body className="font-sans antialiased w-full min-h-screen overflow-x-hidden">
         {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === 'production' && (
+          <>
+            <Analytics />
+            <GoogleAnalytics />
+          </>
+        )}
       </body>
     </html>
   )

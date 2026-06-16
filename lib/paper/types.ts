@@ -28,6 +28,7 @@ export type PaperQuestion = {
 
 export type PaperSection = {
   title: string
+  instruction?: string
   questionType: string
   questions: PaperQuestion[]
 }

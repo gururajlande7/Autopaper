@@ -23,6 +23,14 @@ const subjectDatabaseValues: Record<Subject, string[]> = {
   'math-2': ['math-2', 'Mathematics - II'],
 }
 
+function getSectionInstruction(count: number, attempt = count) {
+  if (attempt >= count) {
+    return `Attempt all ${count} questions.`
+  }
+
+  return `Attempt any ${attempt} of ${count} questions.`
+}
+
 export class PaperGenerationError extends Error {
   constructor(
     message: string,
@@ -268,6 +276,7 @@ export async function generatePaper(
 
     sections = chapterPattern.map((section) => ({
       title: section.title,
+      instruction: getSectionInstruction(section.count, section.attempt),
       questionType: section.questionType,
       questions: selectChapterQuestions(
         questions,
@@ -279,6 +288,7 @@ export async function generatePaper(
   } else {
     sections = pattern.sections.map((section) => ({
       title: section.title,
+      instruction: getSectionInstruction(section.count, section.attempt),
       questionType: section.questionType,
       questions: selectQuestions(
         questions,
@@ -316,7 +326,7 @@ export async function generatePaper(
     difficulty,
     chapter: mode === 'chapter-test' ? chapter : undefined,
     generatedAt: new Date().toISOString(),
-    totalMarks,
+    totalMarks: mode === 'full' ? 40 : totalMarks,
     sections,
   }
 }
