@@ -1,6 +1,6 @@
 import 'server-only'
 import nodemailer from 'nodemailer'
-import { getServerEnv } from '@/lib/server/env'
+import { getEmailEnv } from '@/lib/server/env'
 
 function escapeHtml(value: string) {
   return value
@@ -29,7 +29,7 @@ async function sendEmail({
     SMTP_PORT,
     SMTP_SECURE,
     SMTP_USER,
-  } = getServerEnv()
+  } = getEmailEnv()
 
   const transporter = nodemailer.createTransport({
     auth: {
@@ -72,7 +72,7 @@ export async function sendVerificationEmail({
   name: string
   token: string
 }) {
-  const { NEXT_PUBLIC_APP_URL } = getServerEnv()
+  const { NEXT_PUBLIC_APP_URL } = getEmailEnv()
   const verificationUrl = `${NEXT_PUBLIC_APP_URL}/verify-email?token=${encodeURIComponent(token)}`
   const safeUrl = escapeHtml(verificationUrl)
 
@@ -99,7 +99,7 @@ export async function sendPasswordResetEmail({
   name: string
   token: string
 }) {
-  const { NEXT_PUBLIC_APP_URL } = getServerEnv()
+  const { NEXT_PUBLIC_APP_URL } = getEmailEnv()
   const resetUrl = `${NEXT_PUBLIC_APP_URL}/reset-password?token=${encodeURIComponent(token)}`
   const safeUrl = escapeHtml(resetUrl)
 

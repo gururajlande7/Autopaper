@@ -14,6 +14,12 @@ const serverEnvSchema = z.object({
     .string()
     .min(32, 'JWT_SECRET must contain at least 32 characters.'),
   NEXT_PUBLIC_APP_URL: z.string().url('NEXT_PUBLIC_APP_URL must be a URL.'),
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
+})
+
+const emailEnvSchema = serverEnvSchema.extend({
   SMTP_HOST: z.string().min(1, 'SMTP_HOST is required.'),
   SMTP_PORT: z.coerce
     .number()
@@ -25,14 +31,13 @@ const serverEnvSchema = z.object({
   SMTP_USER: z.string().email('SMTP_USER must be a valid email address.'),
   SMTP_PASS: z.string().min(1, 'SMTP_PASS is required.'),
   EMAIL_FROM: z.string().min(3, 'EMAIL_FROM is required.'),
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
 })
 
 type ServerEnv = z.infer<typeof serverEnvSchema>
+type EmailEnv = z.infer<typeof emailEnvSchema>
 
 let cachedEnv: ServerEnv | undefined
+let cachedEmailEnv: EmailEnv | undefined
 
 export function getServerEnv() {
   if (cachedEnv) {
@@ -40,6 +45,30 @@ export function getServerEnv() {
   }
 
   const parsed = serverEnvSchema.safeParse({
+    MONGODB_URI: process.env.MONGODB_URI,
+    JWT_SECRET: process.env.JWT_SECRET,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NODE_ENV: process.env.NODE_ENV,
+  })
+
+  if (!parsed.success) {
+    const details = parsed.error.issues
+      .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+      .join('; ')
+
+    throw new Error(`Invalid server environment: ${details}`)
+  }
+
+  cachedEnv = parsed.data
+  return cachedEnv
+}
+
+export function getEmailEnv() {
+  if (cachedEmailEnv) {
+    return cachedEmailEnv
+  }
+
+  const parsed = emailEnvSchema.safeParse({
     MONGODB_URI: process.env.MONGODB_URI,
     JWT_SECRET: process.env.JWT_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -57,9 +86,9 @@ export function getServerEnv() {
       .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
       .join('; ')
 
-    throw new Error(`Invalid server environment: ${details}`)
+    throw new Error(`Invalid email environment: ${details}`)
   }
 
-  cachedEnv = parsed.data
-  return cachedEnv
+  cachedEmailEnv = parsed.data
+  return cachedEmailEnv
 }
