@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
+import { readJsonResponse } from '@/lib/client/api'
 
 export function EmailActionForm({
   endpoint,
@@ -27,10 +28,10 @@ export function EmailActionForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      const result = (await response.json()) as {
+      const result = await readJsonResponse<{
         error?: string
         message?: string
-      }
+      }>(response)
 
       if (!response.ok) {
         throw new Error(result.error || 'Unable to process the request.')

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { readJsonResponse } from '@/lib/client/api'
 
 export function LoginForm({
   nextPath = '/create',
@@ -31,10 +32,10 @@ export function LoginForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
-      const result = (await response.json()) as {
+      const result = await readJsonResponse<{
         error?: string
         code?: string
-      }
+      }>(response)
 
       if (!response.ok) {
         throw new Error(result.error || 'Unable to sign in.')
