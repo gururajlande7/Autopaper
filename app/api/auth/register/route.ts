@@ -7,7 +7,6 @@ import { hashPassword } from '@/lib/server/password'
 import { checkRateLimit, getClientIp } from '@/lib/server/rate-limit'
 import { readJsonBody } from '@/lib/server/request'
 import { createOneTimeToken } from '@/lib/server/tokens'
-import { getServerEnv } from '@/lib/server/env'
 import { UserModel } from '@/models/user'
 
 export const runtime = 'nodejs'
@@ -37,21 +36,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message || 'Invalid registration.' },
       { status: 400 },
-    )
-  }
-
-  const { EMAIL_TEST_RECIPIENT } = getServerEnv()
-
-  if (
-    EMAIL_TEST_RECIPIENT &&
-    parsed.data.email !== EMAIL_TEST_RECIPIENT.toLowerCase()
-  ) {
-    return NextResponse.json(
-      {
-        error:
-          'AutoPaper is currently in private email testing. Register with the configured AutoPaper test email.',
-      },
-      { status: 403 },
     )
   }
 

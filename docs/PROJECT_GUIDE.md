@@ -106,7 +106,7 @@ lib/
     auth.ts               Resolve verified users from JWT cookies
     auth-validation.ts    Registration and password validation
     daily-paper-limit.ts  Five successful papers per user per UTC day
-    email.ts              Resend verification/reset emails
+    email.ts              Gmail SMTP verification/reset emails
     env.ts                Server environment validation
     jwt.ts                Signed session tokens and cookie options
     logger.ts             Structured JSON logs
@@ -624,13 +624,13 @@ Server-component version of session lookup using Next.js `cookies()`.
 
 #### `sendVerificationEmail(...)`
 
-Builds a 24-hour confirmation URL and sends it through the Resend HTTPS API.
+Builds a 24-hour confirmation URL and sends it through Gmail SMTP.
 The email link opens a confirmation page; an explicit button consumes the
 token so automated email scanners do not activate accounts.
 
 #### `sendPasswordResetEmail(...)`
 
-Sends a one-hour password-reset URL through Resend.
+Sends a one-hour password-reset URL through Gmail SMTP.
 
 #### `readJsonBody(request)`
 
@@ -910,8 +910,12 @@ Current protections:
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=long-random-secret
 NEXT_PUBLIC_APP_URL=https://your-domain.com
-RESEND_API_KEY=re_xxxxxxxxx
-EMAIL_FROM="AutoPaper <noreply@your-domain.com>"
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=autopaper.official@gmail.com
+SMTP_PASS=your-16-character-google-app-password
+EMAIL_FROM="AutoPaper <autopaper.official@gmail.com>"
 NEXT_PUBLIC_CONTACT_EMAIL=you@example.com
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
@@ -921,8 +925,12 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 | `MONGODB_URI` | Yes | Server database connection and index script |
 | `JWT_SECRET` | Yes | Signing and verifying session JWTs |
 | `NEXT_PUBLIC_APP_URL` | Yes | Email links, metadata, sitemap, robots |
-| `RESEND_API_KEY` | Yes | Verification and password-reset email API |
-| `EMAIL_FROM` | Yes | Verified sender identity in Resend |
+| `SMTP_HOST` | Yes | SMTP server host, usually `smtp.gmail.com` |
+| `SMTP_PORT` | Yes | SMTP server port, usually `465` |
+| `SMTP_SECURE` | Yes | Use `true` for Gmail port `465` |
+| `SMTP_USER` | Yes | Gmail address used to send app emails |
+| `SMTP_PASS` | Yes | Google App Password for `SMTP_USER` |
+| `EMAIL_FROM` | Yes | Sender label and email shown to users |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | No | Contact page |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics 4 web tracking |
 

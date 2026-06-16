@@ -28,7 +28,7 @@ Email and DNS setup is documented in
 - Node.js 20.9 or newer
 - pnpm through Corepack
 - MongoDB Atlas or another production MongoDB deployment
-- A Resend account and verified sending domain
+- A Gmail account with 2-Step Verification and an App Password
 
 ## Environment
 
@@ -38,8 +38,12 @@ Fill in the ignored `.env.local` file:
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=long-random-secret
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-RESEND_API_KEY=re_xxxxxxxxx
-EMAIL_FROM="AutoPaper <noreply@your-domain.com>"
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=autopaper.official@gmail.com
+SMTP_PASS=your-16-character-google-app-password
+EMAIL_FROM="AutoPaper <autopaper.official@gmail.com>"
 NEXT_PUBLIC_CONTACT_EMAIL=you@example.com
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
@@ -67,7 +71,7 @@ Run `db:indexes` against each production database after configuring
 
 1. A user registers with name, email, and password.
 2. The password is hashed with Node.js `scrypt`.
-3. AutoPaper emails a 24-hour verification link through Resend.
+3. AutoPaper emails a 24-hour verification link through Gmail SMTP.
 4. The user explicitly confirms the link.
 5. AutoPaper creates a seven-day signed JWT in an HttpOnly cookie.
 6. Protected pages and APIs validate the JWT and current user session version.
@@ -77,7 +81,7 @@ Run `db:indexes` against each production database after configuring
 
 1. Import the production `questions` collection.
 2. Add every environment variable to the hosting provider.
-3. Verify the email sending domain in Resend.
+3. Configure Gmail SMTP environment variables.
 4. Run `corepack pnpm db:indexes`.
 5. Run `corepack pnpm check`.
 6. Deploy the entire project directory.

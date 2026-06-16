@@ -21,7 +21,11 @@ beforeAll(() => {
   process.env.JWT_SECRET =
     'test-only-secret-that-is-longer-than-thirty-two-characters'
   process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
-  process.env.RESEND_API_KEY = 're_test'
+  process.env.SMTP_HOST = 'smtp.gmail.com'
+  process.env.SMTP_PORT = '465'
+  process.env.SMTP_SECURE = 'true'
+  process.env.SMTP_USER = 'test@example.com'
+  process.env.SMTP_PASS = 'test-app-password'
   process.env.EMAIL_FROM = 'AutoPaper <test@example.com>'
 })
 

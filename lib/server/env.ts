@@ -14,12 +14,17 @@ const serverEnvSchema = z.object({
     .string()
     .min(32, 'JWT_SECRET must contain at least 32 characters.'),
   NEXT_PUBLIC_APP_URL: z.string().url('NEXT_PUBLIC_APP_URL must be a URL.'),
-  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required.'),
+  SMTP_HOST: z.string().min(1, 'SMTP_HOST is required.'),
+  SMTP_PORT: z.coerce
+    .number()
+    .int('SMTP_PORT must be a whole number.')
+    .positive('SMTP_PORT must be positive.'),
+  SMTP_SECURE: z
+    .enum(['true', 'false'])
+    .transform((value) => value === 'true'),
+  SMTP_USER: z.string().email('SMTP_USER must be a valid email address.'),
+  SMTP_PASS: z.string().min(1, 'SMTP_PASS is required.'),
   EMAIL_FROM: z.string().min(3, 'EMAIL_FROM is required.'),
-  EMAIL_TEST_RECIPIENT: z
-    .string()
-    .email('EMAIL_TEST_RECIPIENT must be a valid email address.')
-    .optional(),
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
     .default('development'),
@@ -38,10 +43,12 @@ export function getServerEnv() {
     MONGODB_URI: process.env.MONGODB_URI,
     JWT_SECRET: process.env.JWT_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_SECURE: process.env.SMTP_SECURE ?? 'true',
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASS: process.env.SMTP_PASS,
     EMAIL_FROM: process.env.EMAIL_FROM,
-    EMAIL_TEST_RECIPIENT:
-      process.env.EMAIL_TEST_RECIPIENT || undefined,
     NODE_ENV: process.env.NODE_ENV,
   })
 

@@ -1,4 +1,5 @@
 import 'server-only'
+import nodemailer from 'nodemailer'
 import { getServerEnv } from '@/lib/server/env'
 
 function escapeHtml(value: string) {
@@ -15,45 +16,38 @@ async function sendEmail({
   subject,
   html,
   text,
-  idempotencyKey,
 }: {
   to: string
   subject: string
   html: string
   text: string
-  idempotencyKey: string
 }) {
-  const { RESEND_API_KEY, EMAIL_FROM, EMAIL_TEST_RECIPIENT } = getServerEnv()
+  const {
+    EMAIL_FROM,
+    SMTP_HOST,
+    SMTP_PASS,
+    SMTP_PORT,
+    SMTP_SECURE,
+    SMTP_USER,
+  } = getServerEnv()
 
-  if (
-    EMAIL_TEST_RECIPIENT &&
-    to.toLowerCase() !== EMAIL_TEST_RECIPIENT.toLowerCase()
-  ) {
-    throw new Error(
-      'Email testing is limited to the configured Resend account email.',
-    )
-  }
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': idempotencyKey,
+  const transporter = nodemailer.createTransport({
+    auth: {
+      pass: SMTP_PASS,
+      user: SMTP_USER,
     },
-    body: JSON.stringify({
-      from: EMAIL_FROM,
-      to: [to],
-      subject,
-      html,
-      text,
-    }),
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
   })
 
-  if (!response.ok) {
-    const details = await response.text()
-    throw new Error(`Email provider rejected the request: ${details}`)
-  }
+  await transporter.sendMail({
+    from: EMAIL_FROM,
+    html,
+    subject,
+    text,
+    to,
+  })
 }
 
 function emailLayout(title: string, name: string, body: string) {
@@ -85,7 +79,6 @@ export async function sendVerificationEmail({
   await sendEmail({
     to: email,
     subject: 'Verify your AutoPaper email',
-    idempotencyKey: `verify-${token.slice(0, 32)}`,
     text: `Verify your AutoPaper account: ${verificationUrl}`,
     html: emailLayout(
       'Verify your email',
@@ -113,7 +106,6 @@ export async function sendPasswordResetEmail({
   await sendEmail({
     to: email,
     subject: 'Reset your AutoPaper password',
-    idempotencyKey: `reset-${token.slice(0, 32)}`,
     text: `Reset your AutoPaper password: ${resetUrl}`,
     html: emailLayout(
       'Reset your password',
