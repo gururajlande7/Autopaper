@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db'
 import { PaperGenerationQuotaModel } from '@/models/paper-generation-quota'
 
 export const DAILY_PAPER_LIMIT = 5
+export const FREE_GUEST_PAPER_LIMIT = 2
 
 function getUtcDay(now: Date) {
   return now.toISOString().slice(0, 10)
@@ -26,6 +27,7 @@ function getQuotaId(identity: string, now: Date) {
 
 export async function reserveDailyPaper(
   identity: string,
+  limit = DAILY_PAPER_LIMIT,
   now = new Date(),
 ) {
   await connectToDatabase()
@@ -34,7 +36,7 @@ export async function reserveDailyPaper(
 
   try {
     const quota = await PaperGenerationQuotaModel.findOneAndUpdate(
-      { _id: quotaId, count: { $lt: DAILY_PAPER_LIMIT } },
+      { _id: quotaId, count: { $lt: limit } },
       {
         $inc: { count: 1 },
         $setOnInsert: { expiresAt: getNextUtcDay(now) },
@@ -46,11 +48,11 @@ export async function reserveDailyPaper(
       },
     ).lean()
 
-    const count = quota?.count ?? DAILY_PAPER_LIMIT
+    const count = quota?.count ?? limit
 
     return {
-      allowed: count <= DAILY_PAPER_LIMIT,
-      remaining: Math.max(DAILY_PAPER_LIMIT - count, 0),
+      allowed: count <= limit,
+      remaining: Math.max(limit - count, 0),
       quotaId,
       resetAt: getNextUtcDay(now),
     }

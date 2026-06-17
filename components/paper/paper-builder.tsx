@@ -48,6 +48,7 @@ export function PaperBuilder() {
   const [logoError, setLogoError] = useState('')
   const [paper, setPaper] = useState<GeneratedPaper | null>(null)
   const [dailyRemaining, setDailyRemaining] = useState<number | null>(null)
+  const [dailyLimit, setDailyLimit] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -124,10 +125,14 @@ export function PaperBuilder() {
         paper?: GeneratedPaper
         error?: string
         dailyRemaining?: number
+        dailyLimit?: number
       }
 
       if (typeof result.dailyRemaining === 'number') {
         setDailyRemaining(result.dailyRemaining)
+      }
+      if (typeof result.dailyLimit === 'number') {
+        setDailyLimit(result.dailyLimit)
       }
 
       if (!response.ok || !result.paper) {
@@ -347,8 +352,8 @@ export function PaperBuilder() {
 
             <p className="text-center text-xs text-muted-foreground sm:col-span-3 xl:col-span-1">
               {dailyRemaining === null
-                ? 'You can generate up to 5 papers per day.'
-                : `${dailyRemaining} of 5 paper generations remaining today.`}
+                ? 'Start with 2 free papers. Verified accounts get 5 per day.'
+                : `${dailyRemaining} of ${dailyLimit ?? 5} paper generations remaining today.`}
             </p>
           </div>
         </aside>

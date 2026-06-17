@@ -48,35 +48,38 @@ export default function Home() {
       <BackgroundPattern />
       <Header />
 
-      <section className="relative flex overflow-hidden py-9 sm:min-h-[calc(100svh-73px)] sm:items-center sm:py-10">
-        <div className="relative mx-auto grid w-full max-w-6xl items-center gap-5 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:px-8">
+      <section className="relative flex overflow-hidden py-6 sm:min-h-[calc(100svh-73px)] sm:items-center sm:py-10">
+        <div className="relative mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1.15fr)_minmax(104px,0.85fr)] items-center gap-2 px-4 min-[420px]:gap-4 sm:grid-cols-1 sm:gap-5 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:px-8">
           <div className="max-w-2xl min-w-0 text-left">
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-primary sm:text-sm sm:tracking-[0.18em]">
+            <p className="mb-2 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-primary min-[380px]:text-xs sm:mb-3 sm:text-sm sm:tracking-[0.18em]">
               Class 10 paper generator
             </p>
-            <h1 className="max-w-full text-3xl font-bold leading-[1.08] tracking-tight text-foreground min-[380px]:text-4xl sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-full text-[1.65rem] font-bold leading-[1.03] tracking-tight text-foreground min-[360px]:text-3xl min-[420px]:text-4xl sm:text-5xl lg:text-6xl">
               Create structured question papers{' '}
               <span className="text-accent">in minutes</span>
             </h1>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg">
+            <p className="mt-3 max-w-xl text-xs leading-relaxed text-muted-foreground min-[380px]:text-sm sm:mt-5 sm:text-lg">
               Generate curriculum-aligned papers from your question bank,
               review the A4 layout, and save a clean print-ready PDF.
             </p>
-            <div className="mt-6 grid gap-3 min-[390px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap">
+            <div className="mt-4 grid gap-2 min-[440px]:grid-cols-2 sm:mt-7 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 href="/create"
                 className={cn(
                   buttonVariants({ size: 'lg' }),
-                  'h-11 bg-primary px-4 text-sm text-white hover:bg-primary/90 sm:px-6 sm:text-base',
+                  'h-10 bg-primary px-3 text-xs text-white hover:bg-primary/90 sm:h-11 sm:px-6 sm:text-base',
                 )}
               >
-                Create a question paper
+                <span className="min-[380px]:hidden">Create paper</span>
+                <span className="hidden min-[380px]:inline">
+                  Create a question paper
+                </span>
               </Link>
               <Link
                 href="/about"
                 className={cn(
                   buttonVariants({ size: 'lg', variant: 'outline' }),
-                  'h-11 border-primary px-4 text-sm text-primary sm:px-6 sm:text-base',
+                  'h-10 border-primary px-3 text-xs text-primary sm:h-11 sm:px-6 sm:text-base',
                 )}
               >
                 Learn more
@@ -84,38 +87,40 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto h-[190px] w-full max-w-[300px] sm:h-[300px] sm:max-w-[480px] lg:h-[430px]">
+          <div className="h-[170px] w-full min-w-0 max-w-[190px] justify-self-center min-[380px]:h-[205px] min-[380px]:max-w-[230px] sm:mx-auto sm:h-[300px] sm:max-w-[480px] lg:h-[430px]">
             <AtomCanvas />
           </div>
         </div>
       </section>
 
-      <section className="relative border-y border-border bg-card/55 py-14">
+      <section className="relative border-y border-border bg-card/55 py-10 sm:py-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-9 text-center">
-            <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
+          <div className="mb-6 text-center sm:mb-9">
+            <h2 className="text-2xl font-bold text-foreground sm:text-4xl">
               How it works
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground sm:max-w-none sm:text-base">
               A focused workflow from question bank to printable paper.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-3 md:gap-4">
             {steps.map(({ icon: Icon, title, copy }, index) => (
               <article
-                className="rounded-2xl border border-border bg-card p-5"
+                className="rounded-2xl border border-border bg-card p-4 sm:p-5"
                 key={title}
               >
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-                    <Icon className="h-5 w-5" />
+                <div className="mb-3 flex items-center justify-between sm:mb-4">
+                  <div className="rounded-xl bg-primary/10 p-2 text-primary sm:p-2.5">
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                   <span className="text-sm font-bold text-muted-foreground">
                     0{index + 1}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-foreground">{title}</h3>
+                <h3 className="text-base font-bold text-foreground sm:text-lg">
+                  {title}
+                </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {copy}
                 </p>
@@ -125,23 +130,23 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative py-14">
+      <section className="relative py-10 sm:py-14">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-9 text-center">
-            <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
+          <div className="mb-6 text-center sm:mb-9">
+            <h2 className="text-2xl font-bold text-foreground sm:text-4xl">
               Subjects currently available
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground sm:max-w-none sm:text-base">
               More subjects can be added as their question banks are prepared.
             </p>
           </div>
 
-          <div className="mx-auto grid max-w-3xl gap-4 md:grid-cols-2">
-            <article className="rounded-2xl border border-border bg-card p-6">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
-                <Zap className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto grid max-w-3xl gap-3 md:grid-cols-2 md:gap-4">
+            <article className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 sm:mb-4 sm:h-11 sm:w-11">
+                <Zap className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
               </div>
-              <h3 className="text-xl font-bold">Science</h3>
+              <h3 className="text-lg font-bold sm:text-xl">Science</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 Science and Technology I and II with section-based paper
                 patterns.
@@ -152,11 +157,11 @@ export default function Home() {
               </p>
             </article>
 
-            <article className="rounded-2xl border border-border bg-card p-6">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50">
-                <BarChart3 className="h-6 w-6 text-purple-600" />
+            <article className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 sm:mb-4 sm:h-11 sm:w-11">
+                <BarChart3 className="h-5 w-5 text-purple-600 sm:h-6 sm:w-6" />
               </div>
-              <h3 className="text-xl font-bold">Mathematics</h3>
+              <h3 className="text-lg font-bold sm:text-xl">Mathematics</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 Mathematics I and II with activities, objectives, and
                 structured mark-based questions.
@@ -170,19 +175,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative bg-primary py-12 text-white">
+      <section className="relative bg-primary py-10 text-white sm:py-12">
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 text-center sm:px-6">
-          <h2 className="text-3xl font-bold sm:text-4xl">
+          <h2 className="text-2xl font-bold sm:text-4xl">
             Build your first paper
           </h2>
-          <p className="mt-3 max-w-2xl text-white/80">
+          <p className="mt-3 max-w-2xl text-sm text-white/80 sm:text-base">
             Generate a paper, inspect every page, and save it as an A4 PDF.
           </p>
           <Link
             href="/create"
             className={cn(
               buttonVariants({ size: 'lg' }),
-              'mt-6 h-11 bg-white px-7 text-base font-semibold text-primary hover:bg-white/90',
+              'mt-5 h-10 bg-white px-5 text-sm font-semibold text-primary hover:bg-white/90 sm:mt-6 sm:h-11 sm:px-7 sm:text-base',
             )}
           >
             Open paper builder

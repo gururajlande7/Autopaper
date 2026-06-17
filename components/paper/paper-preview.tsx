@@ -262,35 +262,81 @@ export function PaperPreview({
     }
   }, [examDate, logoUrl, paper, schoolName])
 
-  function handlePrint() {
+  async function handlePrint() {
     const printRoot = printRootRef.current
 
     if (!printRoot) {
       return
     }
 
-    const originalParent = printRoot.parentNode
-    const originalNextSibling = printRoot.nextSibling
+    const styles = Array.from(
+      document.querySelectorAll<HTMLLinkElement | HTMLStyleElement>(
+        'link[rel="stylesheet"], style',
+      ),
+    )
+      .map((node) => node.outerHTML)
+      .join('\n')
+    const printFrame = document.createElement('iframe')
 
-    const restorePrintRoot = () => {
-      document.body.classList.remove('paper-printing')
+    printFrame.setAttribute('aria-hidden', 'true')
+    printFrame.style.position = 'fixed'
+    printFrame.style.right = '0'
+    printFrame.style.bottom = '0'
+    printFrame.style.width = '0'
+    printFrame.style.height = '0'
+    printFrame.style.border = '0'
+    printFrame.style.opacity = '0'
 
-      if (!originalParent) {
-        return
-      }
+    document.body.appendChild(printFrame)
 
-      if (originalNextSibling) {
-        originalParent.insertBefore(printRoot, originalNextSibling)
-      } else {
-        originalParent.appendChild(printRoot)
-      }
+    const printDocument = printFrame.contentDocument
+    const printWindow = printFrame.contentWindow
+
+    if (!printDocument || !printWindow) {
+      printFrame.remove()
+      return
     }
 
-    window.addEventListener('afterprint', restorePrintRoot, { once: true })
-    document.body.appendChild(printRoot)
-    document.body.classList.add('paper-printing')
+    printDocument.open()
+    printDocument.write(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    ${styles}
+    <style>
+      html, body {
+        width: 210mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      .paper-print-root {
+        display: block !important;
+        width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+    </style>
+  </head>
+  <body class="paper-printing">
+    ${printRoot.outerHTML}
+  </body>
+</html>`)
+    printDocument.close()
 
-    requestAnimationFrame(() => window.print())
+    await new Promise((resolve) => setTimeout(resolve, 250))
+    await printDocument.fonts?.ready
+    await waitForImages(printDocument.body)
+
+    const cleanup = () => {
+      printFrame.remove()
+    }
+
+    printWindow.addEventListener('afterprint', cleanup, { once: true })
+    printWindow.focus()
+    printWindow.print()
+    window.setTimeout(cleanup, 10_000)
   }
 
   return (
