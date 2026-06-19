@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import type { GeneratedPaper, PaperQuestion } from '@/lib/paper/types'
 import { PAPER_PATTERNS } from '@/lib/paper/patterns'
 
@@ -9,7 +9,11 @@ type PaperPreviewProps = {
   examDate: string
   schoolName: string
   logoUrl: string
+  autoPrint?: boolean
+  printOnly?: boolean
 }
+
+const mobilePrintStorageKey = 'autopaper.printPayload'
 
 function HtmlText({
   className,
@@ -84,15 +88,18 @@ function waitForImages(container: HTMLElement) {
 }
 
 export function PaperPreview({
+  autoPrint = false,
   paper,
   examDate,
   schoolName,
   logoUrl,
+  printOnly = false,
 }: PaperPreviewProps) {
   const sourceRef = useRef<HTMLDivElement>(null)
   const pagesRef = useRef<HTMLDivElement>(null)
   const printRootRef = useRef<HTMLDivElement>(null)
   const previewViewportRef = useRef<HTMLDivElement>(null)
+  const hasAutoPrintedRef = useRef(false)
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
@@ -262,10 +269,29 @@ export function PaperPreview({
     }
   }, [examDate, logoUrl, paper, schoolName])
 
-  async function handlePrint() {
+  const handlePrint = useCallback(async () => {
     const printRoot = printRootRef.current
 
     if (!printRoot) {
+      return
+    }
+
+    const shouldUsePrintPage =
+      !printOnly &&
+      (window.matchMedia('(max-width: 768px)').matches ||
+        navigator.maxTouchPoints > 0)
+
+    if (shouldUsePrintPage) {
+      sessionStorage.setItem(
+        mobilePrintStorageKey,
+        JSON.stringify({
+          examDate,
+          logoUrl,
+          paper,
+          schoolName,
+        }),
+      )
+      window.location.assign('/paper-print')
       return
     }
 
@@ -285,38 +311,53 @@ export function PaperPreview({
     window.addEventListener('afterprint', cleanup, { once: true })
     window.print()
     window.setTimeout(cleanup, 10_000)
-  }
+  }, [examDate, logoUrl, paper, printOnly, schoolName])
+
+  useEffect(() => {
+    if (!autoPrint || !isReady || hasAutoPrintedRef.current) {
+      return
+    }
+
+    hasAutoPrintedRef.current = true
+    const timeout = window.setTimeout(() => {
+      void handlePrint()
+    }, 400)
+
+    return () => window.clearTimeout(timeout)
+  }, [autoPrint, handlePrint, isReady])
 
   return (
     <div className="paper-preview-shell">
-      <div className="paper-toolbar">
-        <div>
-          <p className="paper-toolbar-title">
-            {PAPER_PATTERNS[paper.subject].label}
-          </p>
-          <p className="paper-toolbar-copy">
-            <span className="capitalize">{paper.difficulty}</span> difficulty
-            {' | '}
-            {paper.mode === 'chapter-test' && (
-              <>Chapter {paper.chapter} | 15 marks | </>
-            )}
-            {paper.sections.reduce(
-              (total, section) => total + section.questions.length,
-              0,
-            )}{' '}
-            questions across {paper.sections.length} sections
-          </p>
-        </div>
+      {!printOnly && (
+        <div className="paper-toolbar">
+          <div>
+            <p className="paper-toolbar-title">
+              {PAPER_PATTERNS[paper.subject].label}
+            </p>
+            <p className="paper-toolbar-copy">
+              <span className="capitalize">{paper.difficulty}</span> difficulty
+              {' | '}
+              {paper.mode === 'chapter-test' && (
+                <>Chapter {paper.chapter} | 15 marks | </>
+              )}
+              {paper.sections.reduce(
+                (total, section) => total + section.questions.length,
+                0,
+              )}{' '}
+              questions across {paper.sections.length} sections
+            </p>
+          </div>
 
-        <button
-          className="paper-print-button"
-          disabled={!isReady}
-          onClick={handlePrint}
-          type="button"
-        >
-          {isReady ? 'Print / Save PDF' : 'Preparing pages...'}
-        </button>
-      </div>
+          <button
+            className="paper-print-button"
+            disabled={!isReady}
+            onClick={handlePrint}
+            type="button"
+          >
+            {isReady ? 'Print / Save PDF' : 'Preparing pages...'}
+          </button>
+        </div>
+      )}
 
       <div
         className="paper-print-root"
