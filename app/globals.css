@@ -427,15 +427,15 @@
   .paper-page-frame {
     position: static;
     width: 210mm;
-    height: 297mm;
     margin: 0;
-    break-after: page;
-    page-break-after: always;
-  }
-
-  .paper-page-frame:last-child {
+    height: auto;
     break-after: auto;
     page-break-after: auto;
+  }
+
+  .paper-page-frame + .paper-page-frame {
+    break-before: page;
+    page-break-before: always;
   }
 
   .paper-a4-page {
@@ -449,6 +449,8 @@
     border: 0 !important;
     box-shadow: none !important;
     transform: none;
+    break-after: auto;
+    page-break-after: auto;
   }
 }
 
