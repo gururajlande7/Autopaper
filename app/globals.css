@@ -405,13 +405,13 @@
     background: white !important;
   }
 
-  body.paper-printing > *:not(.paper-print-root) {
+  body.paper-printing > *:not(.paper-print-clone) {
     display: none !important;
   }
 
-  body.paper-printing > .paper-print-root {
+  body.paper-printing > .paper-print-clone {
     display: block !important;
-    position: static;
+    position: static !important;
     width: 210mm;
     margin: 0 !important;
     padding: 0 !important;

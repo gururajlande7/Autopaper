@@ -269,73 +269,21 @@ export function PaperPreview({
       return
     }
 
-    const styles = Array.from(
-      document.querySelectorAll<HTMLLinkElement | HTMLStyleElement>(
-        'link[rel="stylesheet"], style',
-      ),
-    )
-      .map((node) => node.outerHTML)
-      .join('\n')
-    const printFrame = document.createElement('iframe')
-
-    printFrame.setAttribute('aria-hidden', 'true')
-    printFrame.style.position = 'fixed'
-    printFrame.style.right = '0'
-    printFrame.style.bottom = '0'
-    printFrame.style.width = '0'
-    printFrame.style.height = '0'
-    printFrame.style.border = '0'
-    printFrame.style.opacity = '0'
-
-    document.body.appendChild(printFrame)
-
-    const printDocument = printFrame.contentDocument
-    const printWindow = printFrame.contentWindow
-
-    if (!printDocument || !printWindow) {
-      printFrame.remove()
-      return
-    }
-
-    printDocument.open()
-    printDocument.write(`<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    ${styles}
-    <style>
-      html, body {
-        width: 210mm;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-      }
-      .paper-print-root {
-        display: block !important;
-        width: 210mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
-      }
-    </style>
-  </head>
-  <body class="paper-printing">
-    ${printRoot.outerHTML}
-  </body>
-</html>`)
-    printDocument.close()
-
-    await new Promise((resolve) => setTimeout(resolve, 250))
-    await printDocument.fonts?.ready
-    await waitForImages(printDocument.body)
+    const printClone = printRoot.cloneNode(true) as HTMLElement
+    printClone.classList.add('paper-print-clone')
+    document.body.appendChild(printClone)
 
     const cleanup = () => {
-      printFrame.remove()
+      document.body.classList.remove('paper-printing')
+      printClone.remove()
     }
 
-    printWindow.addEventListener('afterprint', cleanup, { once: true })
-    printWindow.focus()
-    printWindow.print()
+    document.body.classList.add('paper-printing')
+    await document.fonts.ready
+    await waitForImages(printClone)
+
+    window.addEventListener('afterprint', cleanup, { once: true })
+    window.print()
     window.setTimeout(cleanup, 10_000)
   }
 
